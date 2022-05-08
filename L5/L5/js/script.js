@@ -11,15 +11,14 @@ var timerRef = null;	// Referens till timern för bilens förflyttning
 var startBtn;			// Referens till startknappen
 var stopBtn;			// Referens till stoppknappen
 /* === Tillägg i labben === */
-var pigElem;			// Referens till bild av vildsvin
-var pigTimerRef = null  // Ostartad timer
-var pigDuration = 2000  // Anger tid mellan vildsvin i millisekunder
-var pigNr;				// Används för att se om antalet vildsvin är mindre än 10
-var hitCounter;			// Antalet vildsvins som har träffats av bilen
-var pigNrElem;			// Referens till element som visar hur många vildsvin som har hittats
-var hitCounterElem;		// Referens till element som visar hur många vildsvin som har träffats av bilen
-var catchedPig;  		// Ser om ett vildsvin redan har fångats
-
+var pigElem;			// Referens till img-element för grisen
+var pigTimerRef = null; // Referens till timern för grisen
+var pigDuration = 2000; // Sätter tiden som en gris ska vara synlig
+var pigNr;			// Nummer för grisen
+var hitCounter;	// Hur många griser som har träffats
+var pigNrElem; // Referens till element för grisens nummer
+var hitCounterElem; // Referens till element för antal träffar
+var catchedPig; // Stoppar flera  träffar för en gris
 // ------------------------------
 // Initiera globala variabler och koppla funktion till knapp
 function init() {
@@ -38,9 +37,8 @@ function init() {
 		stopBtn.disabled = true;
 	/* === Tillägg i labben === */
 		pigElem = document.getElementById("pig");
-		pigTimerRef = setTimeout(newPig, pigDuration);
-		pigNr = document.getElementById("pigNr")
-		hitCounter = document.getElementById("hitCounter")
+		hitCounterElem = document.getElementById("hitCounter");
+		pigNrElem = document.getElementById("pigNr");
 } // End init
 window.addEventListener("load",init);
 // ------------------------------
@@ -75,12 +73,12 @@ function startGame() {
 	carElem.src = "img/" + carImgs[carDir];
 	moveCar();
 	/* === Tillägg i labben === */
-	pigNr = 0
-	hitCounter = 0
-	pigNrElem.innerHTML = 0
-	hitCounterElem.innerHTML = 0
-	newPig()
-	catchedPig = true
+	hitCounter = 0;
+	pigNr = 0;
+	hitCounterElem.innerHTML = 0;
+	pigNrElem.innerHTML = 0;
+	pigTimerRef = setTimeout(newPig,pigDuration);
+	catchedPig = true;
 } // End startGame
 // ------------------------------
 // Stoppa spelet
@@ -89,14 +87,14 @@ function stopGame() {
 	startBtn.disabled = false;
 	stopBtn.disabled = true;
 	/* === Tillägg i labben === */
-	if(pigTimerRef != null) clearTimeout(pigTimerRef)
-	pigElem.visibility = hidden;
+	pigElem.style.visibility = "hidden";
+
 } // End stopGame
 // ------------------------------
 // Flytta bilen ett steg framåt i bilens riktning
 function moveCar() {
-	let xLimit = boardElem.offsetWidth - carElem.offsetWidth; // Bredd på spelplanen (minus bildens bredd)
-	let yLimit = boardElem.offsetHeight - carElem.offsetHeight; // Höjd på spelplanen (minus bildens höjd)
+	let xLimit = boardElem.offsetWidth - carElem.offsetWidth;
+	let yLimit = boardElem.offsetHeight - carElem.offsetHeight;
 	let x = parseInt(carElem.style.left);	// x-koordinat (left) för bilen
 	let y = parseInt(carElem.style.top);	// y-koordinat (top) för bilen
 	switch (carDir) {
@@ -121,47 +119,47 @@ function moveCar() {
 	carElem.style.top = y + "px";
 	timerRef = setTimeout(moveCar,timerStep);
 	/* === Tillägg i labben === */
-	checkHit()
+	checkHit();
 
 } // End moveCar
 // ------------------------------
 
 /* === Tillägg av nya funktioner i labben === */
-// Skapar nytt vildsvin så länge antalet vildsvin är mindre än 10
+// Skapar en ny gris vid slumpmässig koordinat
 function newPig() {
-	if(pigNr < 10) {
-		let xLimit = boardElem.offsetWidth - pigElem.offsetWidth - 20 	// Bredd på spelplanen (minus bildens bredd)
-		let yLimit = boardElem.offsetHeight - pigElem.offsetHeight - 20 	// Höjd på spelplanen (minus bildens höjd)
-		let x = Math.floor(xLimit*Math.random()) + 10 						// x-koordinat (left) för vildsvinet
-		let y = Math.floor(yLimit*Math.random()) + 10 						// y-koordinat (top) för vildsvinet
-		document.getElementById("pig").src = "img/smack.png"
-		pigElem.visibility = visible
-		pigTimerRef = setTimeout(newPig, pigDuration)
-		pigNr++
-		pigNrElem.innerHTML = pigNr
-		catchedPig = false
+	if (pigNr < 10) {
+		let xLimit = boardElem.offsetWidth - pigElem.offsetWidth - 20; // Spelets gränser i bredd - 20 px för att få plats för grisen
+		let yLimit = boardElem.offsetHeight - pigElem.offsetHeight - 20; // Spelets gränser i höjd - 20 px för att få plats för grisen
+		let x = Math.floor(Math.random() * xLimit) + 10; // slumpa x-koordinat för grisen
+		let y = Math.floor(Math.random() * yLimit) + 10; // slumpa y-koordinat för grisen
+		pigElem.style.left = x + "px";
+		pigElem.style.top = y + "px";
+		pigElem.src = "img/pig.png";
+		pigElem.style.visibility = "visible";
+		pigTimerRef = setTimeout(newPig, pigDuration);
+		pigNr++;
+		pigNrElem.innerHTML = pigNr;
+		catchedPig = false;
 	} else {
-		stopGame()
+		stopGame();
 	}
 }
-
-// Kollar om vildsvinet har träffats
+//Funktion för att kontrollera om grisen har kolliderats med bilen. 
+//Kontrollerar även om grisen redan träffats för att se till att den inte ska kollidera med samma gris flera gånger.
 function checkHit() {
-	if(catchedPig == true) {
-		return
-	}
-	let cSize = carElem.offsetWidth // Bredd på bilen
-	let pSize = pigElem.offsetWidth // Bredd på vildsvinet
-	let cL = parseInt(carElem.style.left) // Bilens x-koordinat (vänster)
-	let cT = parseInt(carElem.style.top) // Bilens y-koordinat (topp)
-	let pL = parseInt(pigElem.style.left) // Vildsvinets x-koordinat (vänster)
-	let pT = parseInt(pigElem.style.top) // Vildsvinets y-koordinat (topp)
-	if(cL+10 < pL+pSize && cL+cSize-10 > pL && cT+10 < pT+pSize && cT+cSize-10 > pT){
-		clearTimeout(pigTimerRef)
-		document.getElementById("pig").src = "img/smack.png"
-		pigTimerRef = setTimeout(newPig, pigDuration)
-		hitCounter++
-		hitCounterElem.innerHTML = hitCounter
-		catchedPig = true
+	if (catchedPig) return;
+	let cSize = carElem.offsetWidth; // Storlek på bilen
+	let pSize = pigElem.offsetWidth; // Storlek på grisen
+	let cL = parseInt(carElem.style.left); // x-koordinat för left för bilen
+	let cT = parseInt(carElem.style.top); // y-koordinat för top för bilen
+	let pL = parseInt(pigElem.style.left); // x-koordinat för left för grisen
+	let pT = parseInt(pigElem.style.top); // y-koordinat för top för grisen
+	if (cL + 10 < pL + pSize && cL + cSize-10 > pL && cT + 10 < pT + pSize && cT + cSize-10 > pT) {
+		clearTimeout(pigTimerRef);
+		pigElem.src = "img/smack.png";
+		pigTimerRef = setTimeout(newPig, pigDuration);
+		hitCounter++;
+		hitCounterElem.innerHTML = hitCounter;
+		catchedPig = true;
 	}
 }
