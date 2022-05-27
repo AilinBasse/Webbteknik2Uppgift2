@@ -47,17 +47,15 @@ function startGame() {
 	let words = [];						// Array för ord
 	for (var i = 0; i < 4; i++) {
 		let r = Math.floor(Math.random()*tempList.length); // Slumpar ett tal
-		words.push(tempList[r]);	
+		words.push(tempList[r]);
 		let ix = allWords.indexOf(tempList[r]); // Hittar index för ordet i all ord listan
 		imgElems[i].src = "img/" + ix + ".jpg";
-		tempList.splice(r,1);
 		imgElems[i].id = ix;
+		tempList.splice(r,1);
 	}
 	for (var i = 0; i < 4; i++) {
 		let r = Math.floor(Math.random()*tempList.length); // Slumpar ett tal
 		words.push(tempList[r]);	
-		let ix = allWords.indexOf(tempList[r]); // Hittar index för ordet i all ord listan
-		imgElems[i].src = "img/" + ix + ".jpg";
 		tempList.splice(r,1);
 	}
 	words.sort();
@@ -78,6 +76,7 @@ function startGame() {
 	checkAnswersBtn.disabled = false;
 	startGameBtn.disabled = true;
 } // End startGame
+
 // ------------------------------
 // Visa förstorad bild
 function showLargeImg() {
@@ -152,14 +151,14 @@ function checkAnswers() {
 		}
 	}
 	for (var j = 0; j < wordElems.length; j++) {
-	wordElems[j].draggable = false;
-	wordElems[j].removeEventListener("dragstart", dragstartWord);
-	wordElems[j].removeEventListener("dragend", dragendWord);
+		wordElems[j].draggable = false;
+		wordElems[j].removeEventListener("dragstart", dragstartWord);
+		wordElems[j].removeEventListener("dragend", dragendWord);
 	}
 	for (var j = 0; j < answerElems.length; j++) {
-	answerElems[j].draggable = false;
-	answerElems[j].removeEventListener("dragstart", dragstartWord);
-	answerElems[j].removeEventListener("dragend", dragendWord);
+		answerElems[j].draggable = false;
+		answerElems[j].removeEventListener("dragstart", dragstartWord);
+		answerElems[j].removeEventListener("dragend", dragendWord);
 	}
 	var points = 0;
 	for (var i = 0; i < answerElems.length; i++) {
